@@ -39,7 +39,17 @@ environments {
     production {
         dataSource {
             dbCreate = "update"
-            url = "jdbc:h2:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
+            String databaseUrl = System.getenv("CLEARDB_DATABASE_URL")
+            if (databaseUrl) {
+                println "Applying MySql settings"
+                println "Url : " + databaseUrl
+                URI dbUri = new URI(databaseUrl);
+                username = dbUri.userInfo.split(":")[0]
+                password = dbUri.userInfo.split(":")[1]
+                url = "jdbc:mysql://" + dbUri.host + dbUri.path
+                driverClassName = "com.mysql.jdbc.Driver"
+            }
+            /*url = "jdbc:h2:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
             pooled = true
             properties {
                maxActive = -1
@@ -50,7 +60,7 @@ environments {
                testWhileIdle=true
                testOnReturn=true
                validationQuery="SELECT 1"
-            }
+            }*/
         }
     }
 }
